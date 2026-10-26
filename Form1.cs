@@ -48,9 +48,8 @@ namespace _25520840_Lab2
                     {
                         writer.Write(rTxt_Output.Text); //Basically write
                     }
+                    MessageBox.Show("Đã lưu file!");
                 }
-
-                MessageBox.Show("Đã lưu file!");
             }
         }
     }

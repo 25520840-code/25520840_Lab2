@@ -29,13 +29,13 @@ File mẫu ở `testdata/`. SQLite và ảnh sao chép được tạo tại Appl
 
 ## Kiểm thử ngày 26/10/2026
 
-40 test tự động trên bản sao có thay hộp thoại bằng dữ liệu fixture: 39 đạt, 1 chưa đạt.
+40 test tự động trên bản sao có thay hộp thoại bằng dữ liệu fixture: 40 đạt, 0 chưa đạt.
 Kết quả gốc: `verification/test-results.json`. Ảnh form sau xử lý: `evidence/`.
 Ảnh là DrawToBitmap từ các WinForms đang chạy, không phải mockup hoặc ảnh chụp thao tác thủ công.
 Các thay thế chỉ áp dụng bản kiểm thử: MessageBox.Show, FileDialog.ShowDialog và thư mục dữ liệu SQLite. Mã nguồn ứng dụng trong thư mục gốc không bị thay đổi.
 Hàm xử lý được gọi qua PerformClick/reflection. Test xóa chỉ thao tác món kiểm thử trong database riêng.
 
-Test 01-04 chưa đạt: hủy hộp thoại lưu Bài 1 vẫn hiện “Đã lưu file!”. Cần đặt thông báo thành công vào nhánh DialogResult.OK.
+Test 01-04 đã đạt sau khi sửa: hủy hộp thoại lưu Bài 1 không còn hiện “Đã lưu file!”. Thông báo thành công nằm trong nhánh DialogResult.OK, sau khi ghi file.
 MSSV Bài 4 hiện giới hạn dạng xx52xxxx; Bài 5 lưu lịch sử bán vé trong phiên; Bài 7 chỉ xem trước các định dạng văn bản tối đa 2 MB.
 
 ## Tệp kiểm thử

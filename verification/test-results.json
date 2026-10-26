@@ -28,8 +28,8 @@
     "task": 1,
     "action": "H\u1EE7y h\u1ED9p tho\u1EA1i l\u01B0u",
     "expected": "Kh\u00F4ng b\u00E1o \u0111\u00E3 l\u01B0u",
-    "actual": "\u0110\u00E3 l\u01B0u file!",
-    "pass": false
+    "actual": "",
+    "pass": true
   },
   {
     "id": "02-01",
