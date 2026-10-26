@@ -1,0 +1,148 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Text.Json;
+using System.Collections;
+using Microsoft.Data.Sqlite;
+
+namespace _25520840_Lab2;
+
+internal static class TestHooks
+{
+    public static string BasePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../evidence"));
+    public static string DataPath = Path.Combine(BasePath, "appdata");
+    public static Queue<(string Path, DialogResult Result)> Dialogs = new();
+    public static List<string> Messages = new();
+    public static DialogResult ShowDialog(FileDialog dialog)
+    {
+        if (Dialogs.Count == 0) throw new Exception("Missing dialog fixture");
+        var next = Dialogs.Dequeue(); dialog.FileName = next.Path; return next.Result;
+    }
+    public static DialogResult ShowMessage(string text, params object[] args)
+    { Messages.Add(text); return args.OfType<MessageBoxButtons>().Any(x=>x==MessageBoxButtons.YesNo) ? DialogResult.Yes : DialogResult.OK; }
+}
+
+internal static class TestRunner
+{
+    static List<object> Results = new();
+    static BindingFlags Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+    static T Field<T>(object obj, string name) => (T)obj.GetType().GetField(name, Flags)!.GetValue(obj)!;
+    static object? Call(object obj, string name, params object[] args)
+    {
+        try { return obj.GetType().GetMethod(name,Flags)!.Invoke(obj,args); }
+        catch(TargetInvocationException e) { throw e.InnerException!; }
+    }
+    static void Click(Form f,string name) { Field<Button>(f,name).PerformClick(); Application.DoEvents(); }
+    static void Set(Form f,string name,string value) => Field<Control>(f,name).Text=value;
+    static string Text(Form f,string name) => Field<Control>(f,name).Text;
+    static string P(string name) => Path.Combine(TestHooks.BasePath,name);
+    static void Dialog(string name,DialogResult result=DialogResult.OK) => TestHooks.Dialogs.Enqueue((P(name), result));
+    static void Check(string id,int task,string action,string expected,string actual,bool pass)
+    { Results.Add(new {id,task,action,expected,actual,pass}); Console.WriteLine($"{id}: {(pass?"PASS":"FAIL")} {actual}"); }
+    static void Shot(Form f,string name)
+    {
+        f.Refresh(); Application.DoEvents();
+        using var bmp=new Bitmap(f.Width,f.Height);
+        f.DrawToBitmap(bmp,new Rectangle(0,0,f.Width,f.Height));
+        bmp.Save(P(name+".png"));
+    }
+    static T Open<T>() where T:Form,new() { var f=new T(); f.Show(); Application.DoEvents(); return f; }
+    static void Group(int task, Action run)
+    { try { run(); } catch(Exception e) {Check($"{task:D2}-EX",task,"Chạy nhóm kiểm thử","Không phát sinh ngoại lệ",e.ToString(),false);} }
+    [STAThread]
+    static void Main()
+    {
+        ApplicationConfiguration.Initialize();
+        Directory.CreateDirectory(TestHooks.BasePath);
+        File.WriteAllText(P("input1.txt"),"Xin chào UIT\r\nLab 2 - 123");
+        File.WriteAllText(P("metadata.txt"),"Hello world\r\nC#",new System.Text.UTF8Encoding(false));
+        File.WriteAllText(P("empty.txt"),"");
+        File.WriteAllText(P("input3.txt"),"2 + 3 * 4\n(2 + 3) * 4\n10 - 3 - 2\n2 * -3\n-(2 + 3)\n444.2 + 1\n1 / 0\n(2 + 3\n2 3\n");
+        using(var menu=Open<MenuForm>()) Shot(menu,"00-menu");
+        Group(1,()=>{
+            using var f=Open<Form1>(); Dialog("input1.txt"); Click(f,"btn_Input");
+            Check("01-01",1,"Đọc input1.txt","Giữ nội dung UTF-8, RichTextBox chuẩn hóa xuống dòng",Text(f,"rTxt_Input"),Text(f,"rTxt_Input").Replace("\r\n","\n")==File.ReadAllText(P("input1.txt")).Replace("\r\n","\n"));
+            Click(f,"btn_Transfer");
+            Check("01-02",1,"Chuyển chữ hoa","XIN CHÀO UIT / LAB 2 - 123",Text(f,"rTxt_Output"),Text(f,"rTxt_Output").Replace("\r\n","\n")=="Xin chào UIT\nLab 2 - 123".ToUpper());
+            Dialog("output1.txt"); Click(f,"btn_Download");
+            Check("01-03",1,"Lưu output1.txt","File khớp ô kết quả",File.ReadAllText(P("output1.txt")),File.ReadAllText(P("output1.txt"))==Text(f,"rTxt_Output"));
+            Shot(f,"01-result"); TestHooks.Messages.Clear(); Dialog("cancel.txt",DialogResult.Cancel); Click(f,"btn_Download");
+            Check("01-04",1,"Hủy hộp thoại lưu","Không báo đã lưu",string.Join("; ",TestHooks.Messages),!TestHooks.Messages.Any(x=>x.Contains("Đã lưu")));
+        });
+        Group(2,()=>{
+            using var f=Open<Form2>(); Dialog("metadata.txt"); Click(f,"btn_Input");
+            Check("02-01",2,"Đọc thông tin metadata.txt","Tên và đường dẫn đúng",Text(f,"txtFileName"),Text(f,"txtFileName")=="metadata.txt"&&Text(f,"txtPath")==P("metadata.txt"));
+            Check("02-02",2,"Đếm nội dung Hello world CRLF C#","2 dòng, 3 từ, 15 ký tự, 15 byte",$"{Text(f,"txtCountLine")} dòng; {Text(f,"txtCountWord")} từ; {Text(f,"txtCountCharacter")} ký tự; {Text(f,"txtSizeInBytes")}",Text(f,"txtCountLine")=="2"&&Text(f,"txtCountWord")=="3"&&Text(f,"txtCountCharacter")=="15"&&Text(f,"txtSizeInBytes")=="15 bytes");
+            Shot(f,"02-result"); Dialog("empty.txt"); Click(f,"btn_Input");
+            Check("02-03",2,"Đọc file rỗng","0 dòng, 0 từ, 0 ký tự",$"{Text(f,"txtCountLine")}/{Text(f,"txtCountWord")}/{Text(f,"txtCountCharacter")}",Text(f,"txtCountLine")=="0"&&Text(f,"txtCountWord")=="0"&&Text(f,"txtCountCharacter")=="0");
+        });
+        Group(3,()=>{
+            using var f=Open<Form3>();
+            foreach(var t in new[]{("2 + 3 * 4",14d),("(2 + 3) * 4",20d),("10 - 3 - 2",5d),("2 * -3",-6d),("-(2 + 3)",-5d),("444.2 + 1",445.2d)})
+            { var val=(double)Call(f,"TinhGiaTri",t.Item1)!; Check("03-"+(Results.Count(x=>JsonSerializer.Serialize(x).Contains("\"task\":3"))+1).ToString("D2"),3,t.Item1,t.Item2.ToString(),val.ToString(),Math.Abs(val-t.Item2)<1e-8); }
+            foreach(var expr in new[]{"1 / 0","(2 + 3","2 3"})
+            { bool rejected=false; string message=""; try{Call(f,"TinhGiaTri",expr);}catch(Exception e){rejected=e is FormatException||e is DivideByZeroException;message=e.Message;} Check("03-E"+expr,3,expr,"Báo lỗi",message,rejected); }
+            Dialog("input3.txt"); Click(f,"btnInput"); Click(f,"btnCalc"); Dialog("output3.txt"); Click(f,"btnDownload");
+            Check("03-FILE",3,"Đọc, tính từng dòng và xuất file","Kết quả và thông báo lỗi được lưu",File.Exists(P("output3.txt"))?"Đã tạo output3.txt":"Không có file",File.Exists(P("output3.txt"))&&File.ReadAllText(P("output3.txt")).Contains("445.2")&&File.ReadAllText(P("output3.txt")).Contains("Lỗi")); Shot(f,"03-result");
+        });
+        Group(4,()=>{
+            using var f=Open<Form4>();
+            Set(f,"txtFullName","Nguyễn Đăng Khiêm");Set(f,"txtMSSV","25520840");Set(f,"txtPhone","0901234567");
+            Field<NumericUpDown>(f,"numDiem1").Value=8;Field<NumericUpDown>(f,"numDiem2").Value=7;Field<NumericUpDown>(f,"numDiem3").Value=9;
+            Click(f,"btnAdd");
+            Set(f,"txtFullName","Sinh viên kiểm thử"); Set(f,"txtMSSV","25520001");Field<NumericUpDown>(f,"numDiem1").Value=6;Field<NumericUpDown>(f,"numDiem2").Value=7;Field<NumericUpDown>(f,"numDiem3").Value=8;Click(f,"btnAdd");
+            Check("04-01",4,"Thêm 2 sinh viên hợp lệ","2 sinh viên",Field<List<SinhVien>>(f,"danhSach").Count.ToString(),Field<List<SinhVien>>(f,"danhSach").Count==2);
+            Set(f,"txtMSSV","123");Click(f,"btnAdd"); Check("04-02",4,"MSSV 123","Từ chối, giữ 2 sinh viên",TestHooks.Messages.Last(),Field<List<SinhVien>>(f,"danhSach").Count==2);
+            Set(f,"txtMSSV","25520002");Set(f,"txtPhone","1234567890");Click(f,"btnAdd");Check("04-03",4,"Điện thoại không bắt đầu bằng 0","Từ chối",TestHooks.Messages.Last(),Field<List<SinhVien>>(f,"danhSach").Count==2);
+            Dialog("input4.txt");Click(f,"btnSaveInput");Dialog("input4.txt");Click(f,"btnCalc");
+            Check("04-04",4,"Đọc JSON và tính trung bình","8.00; trang 1/2",Text(f,"txtAvg")+"; "+Text(f,"txtPage"),Text(f,"txtAvg").Replace(',','.')=="8.00"&&Text(f,"txtPage")=="1/2");Shot(f,"04-result");
+            Click(f,"btnSau");Check("04-05",4,"Trang tiếp theo và giới hạn cuối","7.00; trang 2/2; nút Sau tắt",Text(f,"txtAvg")+"; "+Text(f,"txtPage"),Text(f,"txtAvg").Replace(',','.')=="7.00"&&Text(f,"txtPage")=="2/2"&&!Field<Button>(f,"btnSau").Enabled);
+            Dialog("output4.txt");Click(f,"btnOutput");var students=JsonSerializer.Deserialize<List<SinhVien>>(File.ReadAllText(P("output4.txt")))!;
+            Check("04-06",4,"Xuất output4.txt","Đủ 2 sinh viên và trung bình 8, 7",string.Join(", ",students.Select(x=>x.DiemTrungBinh)),students.Count==2&&students[0].DiemTrungBinh==8&&students[1].DiemTrungBinh==7);
+        });
+        Group(5,()=>{
+            using var f=Open<Form5>(); Set(f,"txtNewFilmName","Mai");Field<NumericUpDown>(f,"numTicketPrice").Value=100000;var rooms=Field<CheckedListBox>(f,"clbFilmRooms"); rooms.SetItemChecked(1,true);rooms.SetItemChecked(2,true);Click(f,"btnAddFilmInfo");
+            Set(f,"txtNewFilmName","Tarot");Field<NumericUpDown>(f,"numTicketPrice").Value=90000;rooms.SetItemChecked(2,true);Click(f,"btnAddFilmInfo");Dialog("input5.txt");Click(f,"btnSaveFilms");Dialog("input5.txt");Click(f,"btnAddFilm");
+            Check("05-01",5,"Thêm, lưu và đọc 2 phim","2 phim, Mai có phòng 2 và 3",File.ReadAllText(P("input5.txt")),Field<Dictionary<string,decimal>>(f,"giaPhim").Count==2&&Field<Dictionary<string,int[]>>(f,"phongPhim")["Mai"].SequenceEqual(new[]{2,3}));
+            Field<ComboBox>(f,"cboPhim").SelectedItem="Mai";Field<ComboBox>(f,"cboPhong").SelectedItem=2;Set(f,"txtHoTen","Khách kiểm thử");Field<CheckBox>(f,"A1").Checked=true;Field<CheckBox>(f,"B2").Checked=true;Click(f,"btnMuaVe");
+            Check("05-02",5,"Mua Mai A1 và B2, giá chuẩn 100000","225000 đồng",Text(f,"txtKetQua"),Field<Dictionary<string,decimal>>(f,"doanhthuPhim")["Mai"]==225000);
+            Check("05-03",5,"Ghế đã bán","A1 và B2 bị vô hiệu hóa",$"A1.Enabled={Field<CheckBox>(f,"A1").Enabled}; B2.Enabled={Field<CheckBox>(f,"B2").Enabled}",!Field<CheckBox>(f,"A1").Enabled&&!Field<CheckBox>(f,"B2").Enabled);
+            Field<ComboBox>(f,"cboPhong").SelectedItem=3;Field<CheckBox>(f,"A2").Checked=true;Click(f,"btnMuaVe");Check("05-04",5,"Cùng khách mua thêm vé ở phòng khác sau 2 vé","Từ chối và doanh thu giữ 225000",TestHooks.Messages.Last(),Field<Dictionary<string,decimal>>(f,"doanhthuPhim")["Mai"]==225000);
+            Field<ComboBox>(f,"cboPhong").SelectedItem=2;Dialog("output5.txt");Click(f,"btnExportRevenue");
+            var sw=System.Diagnostics.Stopwatch.StartNew();while(!f.Enabled&&sw.ElapsedMilliseconds<10000){Application.DoEvents();Thread.Sleep(10);}
+            string stats=File.ReadAllText(P("output5.txt"));
+            Check("05-05",5,"Xuất thống kê và hoàn tất ProgressBar","Bán 2; tồn 28; tỉ lệ 6.67%; doanh thu 225000; Mai trước Tarot",stats,stats.Contains("Số vé bán: 2")&&stats.Contains("Số vé tồn: 28")&&(stats.Contains("6.67%")||stats.Contains("6,67%"))&&stats.IndexOf("Mai")<stats.IndexOf("Tarot")&&Field<ProgressBar>(f,"pbExport").Value==2);Shot(f,"05-result");
+        });
+        Group(6,()=>{
+            using(var bmp=new Bitmap(480,260)){using var g=Graphics.FromImage(bmp);g.Clear(Color.Beige);using var font=new Font("Segoe UI",28);g.DrawString("ANH KIEM THU MON AN",font,Brushes.DarkGreen,15,90);bmp.Save(P("food-test.png"));}
+            using(var f=Open<Form6>()){
+                Click(f,"btnRandom");Check("06-01",6,"Random khi database mới chưa có món","Thông báo chưa có món",TestHooks.Messages.Last(),TestHooks.Messages.Last().Contains("Chưa có món"));
+                Set(f,"txtAddName","Người đóng góp kiểm thử");Click(f,"btnAddName");Check("06-02",6,"Thêm người đóng góp","ComboBox có người vừa thêm",Field<ComboBox>(f,"cboName").Text,Field<ComboBox>(f,"cboName").SelectedIndex>=0);
+                Set(f,"txtAddFood","Cơm gà");Dialog("food-test.png");Click(f,"btnAddPicture");Click(f,"btnAdd");
+                Check("06-03",6,"Thêm món có ảnh và người đóng góp","ListView có 1 món",Field<ListView>(f,"lvFoodList").Items.Count.ToString(),Field<ListView>(f,"lvFoodList").Items.Count==1);
+                Click(f,"btnRandom");Check("06-04",6,"Random khi có 1 món","Cơm gà; đúng người; có ảnh",Text(f,"txtRandRes")+" / "+Text(f,"txtResultName"),Text(f,"txtRandRes")=="Cơm gà"&&Text(f,"txtResultName")=="Người đóng góp kiểm thử"&&Field<PictureBox>(f,"pcbFoodPic").Image!=null);Shot(f,"06-result");
+            }
+            using(var f=Open<Form6>()){
+                Check("06-05",6,"Đóng và tạo lại form","Món ăn vẫn tồn tại trong SQLite",Field<ListView>(f,"lvFoodList").Items.Count.ToString(),Field<ListView>(f,"lvFoodList").Items.Count==1);
+                var list=Field<ListView>(f,"lvFoodList");list.Items[0].Selected=true;list.Select();Application.DoEvents();Click(f,"btnDelete");
+                Check("06-06",6,"Xóa món kiểm thử được chọn, xác nhận Yes","Danh sách còn 0 món",list.Items.Count.ToString(),list.Items.Count==0);
+            }
+        });
+        Group(7,()=>{
+            string dir=P("browse");Directory.CreateDirectory(Path.Combine(dir,"subfolder"));File.WriteAllText(Path.Combine(dir,"sample.txt"),"Nội dung kiểm thử Bài 7");File.WriteAllBytes(Path.Combine(dir,"binary.bin"),new byte[]{0,1,2});File.WriteAllText(Path.Combine(dir,"large.txt"),new string('x',2*1024*1024+1));
+            using var f=Open<Form7>();Call(f,"HienThiThuMuc",dir);var list=Field<ListView>(f,"listvFolder");
+            Check("07-01",7,"Liệt kê thư mục kiểm thử","1 thư mục và 3 file",list.Items.Count.ToString(),list.Items.Count==4);
+            void Select(string name){foreach(ListViewItem i in list.Items)i.Selected=false;var it=list.Items.Cast<ListViewItem>().First(x=>x.Text==name);it.Selected=true;list.Select();Application.DoEvents();}
+            Select("sample.txt");Check("07-02",7,"Chọn sample.txt","Hiển thị nội dung văn bản",Text(f,"rTxtInfo"),Text(f,"rTxtInfo")=="Nội dung kiểm thử Bài 7");Shot(f,"07-result");
+            Select("binary.bin");Check("07-03",7,"Chọn định dạng không hỗ trợ","Thông báo chưa hỗ trợ",Text(f,"rTxtInfo"),Text(f,"rTxtInfo").Contains("Chưa hỗ trợ"));
+            Select("large.txt");Check("07-04",7,"Chọn file hơn 2 MB","Từ chối xem trước",Text(f,"rTxtInfo"),Text(f,"rTxtInfo").Contains("2 MB"));
+            Select("subfolder");Call(f,"listvFolder_DoubleClick",list,EventArgs.Empty);Check("07-05",7,"Mở thư mục qua handler DoubleClick","Đường dẫn chuyển sang subfolder",Text(f,"mTxtFullName"),Text(f,"mTxtFullName")==Path.Combine(dir,"subfolder"));
+            Click(f,"btnReturn");Check("07-06",7,"Quay về thư mục cha","Trở về browse",Text(f,"mTxtFullName"),Text(f,"mTxtFullName")==dir);
+        });
+        File.WriteAllText(P("test-results.json"),JsonSerializer.Serialize(Results,new JsonSerializerOptions{WriteIndented=true}));
+        Console.WriteLine("Evidence: "+TestHooks.BasePath);
+    }
+}

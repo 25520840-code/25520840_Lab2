@@ -1,0 +1,322 @@
+[
+  {
+    "id": "01-01",
+    "task": 1,
+    "action": "\u0110\u1ECDc input1.txt",
+    "expected": "Gi\u1EEF n\u1ED9i dung UTF-8, RichTextBox chu\u1EA9n h\u00F3a xu\u1ED1ng d\u00F2ng",
+    "actual": "Xin ch\u00E0o UIT\nLab 2 - 123",
+    "pass": true
+  },
+  {
+    "id": "01-02",
+    "task": 1,
+    "action": "Chuy\u1EC3n ch\u1EEF hoa",
+    "expected": "XIN CH\u00C0O UIT / LAB 2 - 123",
+    "actual": "XIN CH\u00C0O UIT\nLAB 2 - 123",
+    "pass": true
+  },
+  {
+    "id": "01-03",
+    "task": 1,
+    "action": "L\u01B0u output1.txt",
+    "expected": "File kh\u1EDBp \u00F4 k\u1EBFt qu\u1EA3",
+    "actual": "XIN CH\u00C0O UIT\nLAB 2 - 123",
+    "pass": true
+  },
+  {
+    "id": "01-04",
+    "task": 1,
+    "action": "H\u1EE7y h\u1ED9p tho\u1EA1i l\u01B0u",
+    "expected": "Kh\u00F4ng b\u00E1o \u0111\u00E3 l\u01B0u",
+    "actual": "\u0110\u00E3 l\u01B0u file!",
+    "pass": false
+  },
+  {
+    "id": "02-01",
+    "task": 2,
+    "action": "\u0110\u1ECDc th\u00F4ng tin metadata.txt",
+    "expected": "T\u00EAn v\u00E0 \u0111\u01B0\u1EDDng d\u1EABn \u0111\u00FAng",
+    "actual": "metadata.txt",
+    "pass": true
+  },
+  {
+    "id": "02-02",
+    "task": 2,
+    "action": "\u0110\u1EBFm n\u1ED9i dung Hello world CRLF C#",
+    "expected": "2 d\u00F2ng, 3 t\u1EEB, 15 k\u00FD t\u1EF1, 15 byte",
+    "actual": "2 d\u00F2ng; 3 t\u1EEB; 15 k\u00FD t\u1EF1; 15 bytes",
+    "pass": true
+  },
+  {
+    "id": "02-03",
+    "task": 2,
+    "action": "\u0110\u1ECDc file r\u1ED7ng",
+    "expected": "0 d\u00F2ng, 0 t\u1EEB, 0 k\u00FD t\u1EF1",
+    "actual": "0/0/0",
+    "pass": true
+  },
+  {
+    "id": "03-01",
+    "task": 3,
+    "action": "2 \u002B 3 * 4",
+    "expected": "14",
+    "actual": "14",
+    "pass": true
+  },
+  {
+    "id": "03-02",
+    "task": 3,
+    "action": "(2 \u002B 3) * 4",
+    "expected": "20",
+    "actual": "20",
+    "pass": true
+  },
+  {
+    "id": "03-03",
+    "task": 3,
+    "action": "10 - 3 - 2",
+    "expected": "5",
+    "actual": "5",
+    "pass": true
+  },
+  {
+    "id": "03-04",
+    "task": 3,
+    "action": "2 * -3",
+    "expected": "-6",
+    "actual": "-6",
+    "pass": true
+  },
+  {
+    "id": "03-05",
+    "task": 3,
+    "action": "-(2 \u002B 3)",
+    "expected": "-5",
+    "actual": "-5",
+    "pass": true
+  },
+  {
+    "id": "03-06",
+    "task": 3,
+    "action": "444.2 \u002B 1",
+    "expected": "445.2",
+    "actual": "445.2",
+    "pass": true
+  },
+  {
+    "id": "03-E1 / 0",
+    "task": 3,
+    "action": "1 / 0",
+    "expected": "B\u00E1o l\u1ED7i",
+    "actual": "Kh\u00F4ng th\u1EC3 chia cho 0.",
+    "pass": true
+  },
+  {
+    "id": "03-E(2 \u002B 3",
+    "task": 3,
+    "action": "(2 \u002B 3",
+    "expected": "B\u00E1o l\u1ED7i",
+    "actual": "Ngo\u1EB7c kh\u00F4ng kh\u1EDBp.",
+    "pass": true
+  },
+  {
+    "id": "03-E2 3",
+    "task": 3,
+    "action": "2 3",
+    "expected": "B\u00E1o l\u1ED7i",
+    "actual": "Thi\u1EBFu to\u00E1n t\u1EED gi\u1EEFa hai s\u1ED1.",
+    "pass": true
+  },
+  {
+    "id": "03-FILE",
+    "task": 3,
+    "action": "\u0110\u1ECDc, t\u00EDnh t\u1EEBng d\u00F2ng v\u00E0 xu\u1EA5t file",
+    "expected": "K\u1EBFt qu\u1EA3 v\u00E0 th\u00F4ng b\u00E1o l\u1ED7i \u0111\u01B0\u1EE3c l\u01B0u",
+    "actual": "\u0110\u00E3 t\u1EA1o output3.txt",
+    "pass": true
+  },
+  {
+    "id": "04-01",
+    "task": 4,
+    "action": "Th\u00EAm 2 sinh vi\u00EAn h\u1EE3p l\u1EC7",
+    "expected": "2 sinh vi\u00EAn",
+    "actual": "2",
+    "pass": true
+  },
+  {
+    "id": "04-02",
+    "task": 4,
+    "action": "MSSV 123",
+    "expected": "T\u1EEB ch\u1ED1i, gi\u1EEF 2 sinh vi\u00EAn",
+    "actual": "MSSV ph\u1EA3i c\u00F3 8 ch\u1EEF s\u1ED1, d\u1EA1ng xx52xxxx.",
+    "pass": true
+  },
+  {
+    "id": "04-03",
+    "task": 4,
+    "action": "\u0110i\u1EC7n tho\u1EA1i kh\u00F4ng b\u1EAFt \u0111\u1EA7u b\u1EB1ng 0",
+    "expected": "T\u1EEB ch\u1ED1i",
+    "actual": "\u0110i\u1EC7n tho\u1EA1i ph\u1EA3i c\u00F3 10 ch\u1EEF s\u1ED1 v\u00E0 b\u1EAFt \u0111\u1EA7u b\u1EB1ng 0.",
+    "pass": true
+  },
+  {
+    "id": "04-04",
+    "task": 4,
+    "action": "\u0110\u1ECDc JSON v\u00E0 t\u00EDnh trung b\u00ECnh",
+    "expected": "8.00; trang 1/2",
+    "actual": "8.00; 1/2",
+    "pass": true
+  },
+  {
+    "id": "04-05",
+    "task": 4,
+    "action": "Trang ti\u1EBFp theo v\u00E0 gi\u1EDBi h\u1EA1n cu\u1ED1i",
+    "expected": "7.00; trang 2/2; n\u00FAt Sau t\u1EAFt",
+    "actual": "7.00; 2/2",
+    "pass": true
+  },
+  {
+    "id": "04-06",
+    "task": 4,
+    "action": "Xu\u1EA5t output4.txt",
+    "expected": "\u0110\u1EE7 2 sinh vi\u00EAn v\u00E0 trung b\u00ECnh 8, 7",
+    "actual": "8, 7",
+    "pass": true
+  },
+  {
+    "id": "05-01",
+    "task": 5,
+    "action": "Th\u00EAm, l\u01B0u v\u00E0 \u0111\u1ECDc 2 phim",
+    "expected": "2 phim, Mai c\u00F3 ph\u00F2ng 2 v\u00E0 3",
+    "actual": "Mai\r\n100000\r\n2,3\r\nTarot\r\n90000\r\n3\r\n",
+    "pass": true
+  },
+  {
+    "id": "05-02",
+    "task": 5,
+    "action": "Mua Mai A1 v\u00E0 B2, gi\u00E1 chu\u1EA9n 100000",
+    "expected": "225000 \u0111\u1ED3ng",
+    "actual": "Customer: Kh\u00E1ch ki\u1EC3m th\u1EED\r\nFilm: Mai\r\nRoom: 2\r\nSeats: B2, A1\r\nTotal: 225,000\u0111",
+    "pass": true
+  },
+  {
+    "id": "05-03",
+    "task": 5,
+    "action": "Gh\u1EBF \u0111\u00E3 b\u00E1n",
+    "expected": "A1 v\u00E0 B2 b\u1ECB v\u00F4 hi\u1EC7u h\u00F3a",
+    "actual": "A1.Enabled=False; B2.Enabled=False",
+    "pass": true
+  },
+  {
+    "id": "05-04",
+    "task": 5,
+    "action": "C\u00F9ng kh\u00E1ch mua th\u00EAm v\u00E9 \u1EDF ph\u00F2ng kh\u00E1c sau 2 v\u00E9",
+    "expected": "T\u1EEB ch\u1ED1i v\u00E0 doanh thu gi\u1EEF 225000",
+    "actual": "Khong duoc mua qua 2 ve o cac phong chieu khac nhau.",
+    "pass": true
+  },
+  {
+    "id": "05-05",
+    "task": 5,
+    "action": "Xu\u1EA5t th\u1ED1ng k\u00EA v\u00E0 ho\u00E0n t\u1EA5t ProgressBar",
+    "expected": "B\u00E1n 2; t\u1ED3n 28; t\u1EC9 l\u1EC7 6.67%; doanh thu 225000; Mai tr\u01B0\u1EDBc Tarot",
+    "actual": "TH\u1ED0NG K\u00CA PH\u00D2NG V\u00C9\r\n\r\nT\u00EAn phim: Mai\r\nS\u1ED1 v\u00E9 b\u00E1n: 2\r\nS\u1ED1 v\u00E9 t\u1ED3n: 28\r\nT\u1EC9 l\u1EC7 b\u00E1n: 6.67%\r\nDoanh thu: 225,000 \u0111\r\nX\u1EBFp h\u1EA1ng doanh thu: 1\r\n--------------------------------\r\nT\u00EAn phim: Tarot\r\nS\u1ED1 v\u00E9 b\u00E1n: 0\r\nS\u1ED1 v\u00E9 t\u1ED3n: 15\r\nT\u1EC9 l\u1EC7 b\u00E1n: 0.00%\r\nDoanh thu: 0 \u0111\r\nX\u1EBFp h\u1EA1ng doanh thu: 2\r\n--------------------------------\r\n",
+    "pass": true
+  },
+  {
+    "id": "06-01",
+    "task": 6,
+    "action": "Random khi database m\u1EDBi ch\u01B0a c\u00F3 m\u00F3n",
+    "expected": "Th\u00F4ng b\u00E1o ch\u01B0a c\u00F3 m\u00F3n",
+    "actual": "Ch\u01B0a c\u00F3 m\u00F3n \u0103n. H\u00E3y th\u00EAm m\u00F3n tr\u01B0\u1EDBc!",
+    "pass": true
+  },
+  {
+    "id": "06-02",
+    "task": 6,
+    "action": "Th\u00EAm ng\u01B0\u1EDDi \u0111\u00F3ng g\u00F3p",
+    "expected": "ComboBox c\u00F3 ng\u01B0\u1EDDi v\u1EEBa th\u00EAm",
+    "actual": "Ng\u01B0\u1EDDi \u0111\u00F3ng g\u00F3p ki\u1EC3m th\u1EED",
+    "pass": true
+  },
+  {
+    "id": "06-03",
+    "task": 6,
+    "action": "Th\u00EAm m\u00F3n c\u00F3 \u1EA3nh v\u00E0 ng\u01B0\u1EDDi \u0111\u00F3ng g\u00F3p",
+    "expected": "ListView c\u00F3 1 m\u00F3n",
+    "actual": "1",
+    "pass": true
+  },
+  {
+    "id": "06-04",
+    "task": 6,
+    "action": "Random khi c\u00F3 1 m\u00F3n",
+    "expected": "C\u01A1m g\u00E0; \u0111\u00FAng ng\u01B0\u1EDDi; c\u00F3 \u1EA3nh",
+    "actual": "C\u01A1m g\u00E0 / Ng\u01B0\u1EDDi \u0111\u00F3ng g\u00F3p ki\u1EC3m th\u1EED",
+    "pass": true
+  },
+  {
+    "id": "06-05",
+    "task": 6,
+    "action": "\u0110\u00F3ng v\u00E0 t\u1EA1o l\u1EA1i form",
+    "expected": "M\u00F3n \u0103n v\u1EABn t\u1ED3n t\u1EA1i trong SQLite",
+    "actual": "1",
+    "pass": true
+  },
+  {
+    "id": "06-06",
+    "task": 6,
+    "action": "X\u00F3a m\u00F3n ki\u1EC3m th\u1EED \u0111\u01B0\u1EE3c ch\u1ECDn, x\u00E1c nh\u1EADn Yes",
+    "expected": "Danh s\u00E1ch c\u00F2n 0 m\u00F3n",
+    "actual": "0",
+    "pass": true
+  },
+  {
+    "id": "07-01",
+    "task": 7,
+    "action": "Li\u1EC7t k\u00EA th\u01B0 m\u1EE5c ki\u1EC3m th\u1EED",
+    "expected": "1 th\u01B0 m\u1EE5c v\u00E0 3 file",
+    "actual": "4",
+    "pass": true
+  },
+  {
+    "id": "07-02",
+    "task": 7,
+    "action": "Ch\u1ECDn sample.txt",
+    "expected": "Hi\u1EC3n th\u1ECB n\u1ED9i dung v\u0103n b\u1EA3n",
+    "actual": "N\u1ED9i dung ki\u1EC3m th\u1EED B\u00E0i 7",
+    "pass": true
+  },
+  {
+    "id": "07-03",
+    "task": 7,
+    "action": "Ch\u1ECDn \u0111\u1ECBnh d\u1EA1ng kh\u00F4ng h\u1ED7 tr\u1EE3",
+    "expected": "Th\u00F4ng b\u00E1o ch\u01B0a h\u1ED7 tr\u1EE3",
+    "actual": "Ch\u01B0a h\u1ED7 tr\u1EE3 xem tr\u01B0\u1EDBc \u0111\u1ECBnh d\u1EA1ng file n\u00E0y.",
+    "pass": true
+  },
+  {
+    "id": "07-04",
+    "task": 7,
+    "action": "Ch\u1ECDn file h\u01A1n 2 MB",
+    "expected": "T\u1EEB ch\u1ED1i xem tr\u01B0\u1EDBc",
+    "actual": "File l\u1EDBn h\u01A1n 2 MB, kh\u00F4ng hi\u1EC3n th\u1ECB xem tr\u01B0\u1EDBc.",
+    "pass": true
+  },
+  {
+    "id": "07-05",
+    "task": 7,
+    "action": "M\u1EDF th\u01B0 m\u1EE5c qua handler DoubleClick",
+    "expected": "\u0110\u01B0\u1EDDng d\u1EABn chuy\u1EC3n sang subfolder",
+    "actual": "D:\\Doc\\[Network Programming]\\tmp\\lab2-tests\\evidence\\browse\\subfolder",
+    "pass": true
+  },
+  {
+    "id": "07-06",
+    "task": 7,
+    "action": "Quay v\u1EC1 th\u01B0 m\u1EE5c cha",
+    "expected": "Tr\u1EDF v\u1EC1 browse",
+    "actual": "D:\\Doc\\[Network Programming]\\tmp\\lab2-tests\\evidence\\browse",
+    "pass": true
+  }
+]

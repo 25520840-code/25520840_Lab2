@@ -1,0 +1,16 @@
+﻿THỐNG KÊ PHÒNG VÉ
+
+Tên phim: Mai
+Số vé bán: 2
+Số vé tồn: 28
+Tỉ lệ bán: 6.67%
+Doanh thu: 225,000 đ
+Xếp hạng doanh thu: 1
+--------------------------------
+Tên phim: Tarot
+Số vé bán: 0
+Số vé tồn: 15
+Tỉ lệ bán: 0.00%
+Doanh thu: 0 đ
+Xếp hạng doanh thu: 2
+--------------------------------
